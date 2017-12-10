@@ -2,9 +2,102 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:clear="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Уютный домик для игрушек/полка для книг </title>
+	<title>Уютный домик для игрушек, ночник и полка для книг</title>
 	<meta charset="utf-8">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<style>
+        body {
+        	background: url(img/house-background.jpg) no-repeat;
+            background-attachment: fixed;
+            -moz-background-size: 100%;
+            -webkit-background-size: 100%;
+            -o-background-size: 100%;
+            background-size: 100%;
+            background-color: #ffffff;
+        }
+        .carousel-inner{
+            width:100%;
+        }
+        p.caption{
+            margin-top:5pt;
+            margin-left:5pt;
+        }
+        .carousel-caption{
+            text-shadow: 2px 2px 2px rgba(0,0,0,1);
+        }
+        h3 > a:link {
+            color: white;
+            text-decoration: underline;
+        }
+        h3 > a:visited {
+            color: white;
+        }
+    </style>
 </head>
 <body>
+	<h1 style="color: black; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white; text-align: center;">Уютный домик для игрушек,<br>ночник и полка для книг</h1>
+	<div id="myCarousel" class="carousel slide" data-ride="carousel" style="">
+		<ol class="carousel-indicators">
+			<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+			<li data-target="#myCarousel" data-slide-to="1"></li>
+			<li data-target="#myCarousel" data-slide-to="2"></li>
+			<li data-target="#myCarousel" data-slide-to="3"></li>
+			<li data-target="#myCarousel" data-slide-to="4"></li>
+			<li data-target="#myCarousel" data-slide-to="5"></li>
+			<li data-target="#myCarousel" data-slide-to="6"></li>
+			<li data-target="#myCarousel" data-slide-to="7"></li>
+		</ol>
+
+		<div class="carousel-inner" role="listbox">
+
+			<div class="item active">
+				<img src="img/main-view.jpg" class="img-responsive center-block">
+			</div>
+
+			<div class="item ">
+				<img src="img/top-view.jpg" class="img-responsive center-block">
+			</div>
+
+			<div class="item ">
+				<img src="img/all-floors.jpg" class="img-responsive center-block">
+			</div>
+
+			<div class="item ">
+				<img src="img/bedroom-kitchen.jpg" class="img-responsive center-block">
+			</div>
+
+			<div class="item ">
+				<img src="img/2d_floor.jpg" class="img-responsive center-block">
+			</div>
+
+			<div class="item ">
+				<img src="img/bathroom.jpg" class="img-responsive center-block">
+			</div>
+
+			<div class="item ">
+				<img src="img/bedroom.jpg" class="img-responsive center-block">
+			</div>
+
+			<div class="item ">
+				<img src="img/ground-floor.jpg" class="img-responsive center-block">
+			</div>
+
+
+
+		</div>
+		<a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+			<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+			<span class="sr-only">Предыдущий</span>
+		</a>
+		<a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+			<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+			<span class="sr-only">Следующий</span>
+		</a>
+	</div>
+	<p style="text-align: center;">Игрушки для фотографий домика любезно предоставлены Анной из магазинчика материалов для творческой души <a href="http://artkoza.ru">ArtKoza</a></p>
 </body>
 </html>
