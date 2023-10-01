@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Map of negative factors in Berlin that affect housing comfort</title>
+    <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
+    <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet'/>
+    <style>
+        #map-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        #map {
+                width: 100%;
+                height: 100%;
+             }
+    </style>
+</head>
+<body>
+<div id="map-container">
+    <div id="map"></div>
+</div>
+<script>
+    const style = {
+      "version": 8,
+        "sources": {
+        "osm": {
+                "type": "raster",
+                "tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                "tileSize": 256,
+          "attribution": "&copy; OpenStreetMap Contributors",
+          "maxzoom": 19
+        }
+      },
+      "layers": [
+        {
+          "id": "osm",
+          "type": "raster",
+          "source": "osm"
+        }
+      ]
+    };
+
+    var map = new maplibregl.Map({
+      container: 'map',
+      style: style,
+      center: [13.4092, 52.5151],
+      zoom: 12
+    });
+
+    map.on('load', function () {
+        map.addSource('geojson-0', {
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored-0.json'
+        });
+
+        map.addLayer({
+            id: 'geojson-0-layer',
+            type: 'fill',
+            source: 'geojson-0',
+            paint: {
+                'fill-color': ['get', 'fill'],
+                'fill-opacity': 0.5
+            }
+        });
+
+        map.addSource('geojson-1', {
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored-1.json'
+        });
+
+        map.addLayer({
+            id: 'geojson-1-layer',
+            type: 'fill',
+            source: 'geojson-1',
+            paint: {
+                'fill-color': ['get', 'fill'],
+                'fill-opacity': 0.5
+            }
+        });
+
+
+        map.addSource('geojson-2', {
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored-2.json'
+        });
+
+        map.addLayer({
+            id: 'geojson-2-layer',
+            type: 'fill',
+            source: 'geojson-2',
+            paint: {
+                'fill-color': ['get', 'fill'],
+                'fill-opacity': 0.5
+            }
+        });
+
+        map.addSource('geojson-3', {
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored-3.json'
+        });
+
+        map.addLayer({
+            id: 'geojson-3-layer',
+            type: 'fill',
+            source: 'geojson-3',
+            paint: {
+                'fill-color': ['get', 'fill'],
+                'fill-opacity': 0.5
+            }
+        });
+    });
+</script>
+</body>
+</html>
