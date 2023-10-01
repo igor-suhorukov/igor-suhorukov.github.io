@@ -23,6 +23,14 @@
     <div id="map"></div>
 </div>
 <script>
+    function displayInfo(selectedFeature) {
+        var popup = new maplibregl.Popup()
+        .setLngLat(selectedFeature.geometry.coordinates[0][0])
+        .setHTML('<h3>issues count ' + selectedFeature.properties.count +
+                    '<br/>reason '+ selectedFeature.properties.reason+'</h3>')
+        .addTo(map);
+    }
+    
     const style = {
       "version": 8,
         "sources": {
@@ -51,66 +59,37 @@
     });
 
     map.on('load', function () {
-        map.addSource('geojson-0', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov.github.io/main/berlin-h3-10_colored-0.json'
-        });
+        
+        for (var idx = 0; idx <= 3; idx++) {
 
-        map.addLayer({
-            id: 'geojson-0-layer',
-            type: 'fill',
-            source: 'geojson-0',
-            paint: {
-                'fill-color': ['get', 'fill'],
-                'fill-opacity': 0.5
-            }
-        });
+            map.addSource('geojson-'+idx, {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored-'+idx+'.json'
+            });
 
-        map.addSource('geojson-1', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov.github.io/main/berlin-h3-10_colored-1.json'
-        });
+            map.addLayer({
+                id: 'geojson-'+idx+'-layer',
+                type: 'fill',
+                source: 'geojson-'+idx,
+                paint: {
+                    'fill-color': ['get', 'fill'],
+                    'fill-opacity': 0.5
+                }
+            });
 
-        map.addLayer({
-            id: 'geojson-1-layer',
-            type: 'fill',
-            source: 'geojson-1',
-            paint: {
-                'fill-color': ['get', 'fill'],
-                'fill-opacity': 0.5
-            }
-        });
+            map.on('click', 'geojson-'+idx+'-layer', function (e) {
+                var selectedFeature = e.features[0];
+                displayInfo(selectedFeature);
+            });
 
+            map.on('mouseenter', 'geojson-'+idx+'-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
 
-        map.addSource('geojson-2', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov.github.io/main/berlin-h3-10_colored-2.json'
-        });
-
-        map.addLayer({
-            id: 'geojson-2-layer',
-            type: 'fill',
-            source: 'geojson-2',
-            paint: {
-                'fill-color': ['get', 'fill'],
-                'fill-opacity': 0.5
-            }
-        });
-
-        map.addSource('geojson-3', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov.github.io/main/berlin-h3-10_colored-3.json'
-        });
-
-        map.addLayer({
-            id: 'geojson-3-layer',
-            type: 'fill',
-            source: 'geojson-3',
-            paint: {
-                'fill-color': ['get', 'fill'],
-                'fill-opacity': 0.5
-            }
-        });
+            map.on('mouseleave', 'geojson-'+idx+'-layer', function () {
+                map.getCanvas().style.cursor = '';
+            });
+        }
     });
 </script>
 </body>
