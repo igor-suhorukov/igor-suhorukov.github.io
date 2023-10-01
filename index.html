@@ -24,9 +24,10 @@
 </div>
 <script>
     function displayInfo(selectedFeature) {
+        if(selectedFeature.properties.fill=='#00ff00') return;
         var popup = new maplibregl.Popup()
         .setLngLat(selectedFeature.geometry.coordinates[0][0])
-        .setHTML('<h3>issues count ' + selectedFeature.properties.count +
+        .setHTML('<h3>count ' + selectedFeature.properties.count +
                     '<br/>reason '+ selectedFeature.properties.reason+'</h3>')
         .addTo(map);
     }
