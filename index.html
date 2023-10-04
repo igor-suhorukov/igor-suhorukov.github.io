@@ -27,7 +27,7 @@
 
     let osm_reason;
 
-    fetch('https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-factors.json.gz')
+    fetch('/berlin-factors.json.gz')
     .then(response => {
         if (!response.ok) {
             throw new Error('no reason details loaded');
@@ -88,7 +88,7 @@
 
     map.on('load', function () {
 
-        fetch('https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored.json.gz')
+        fetch('/berlin-h3-10_colored.json.gz')
         .then(response => {
             if (!response.ok) {
                 throw new Error('geojson isn\'t loaded');
