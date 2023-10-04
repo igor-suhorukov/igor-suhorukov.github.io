@@ -4,6 +4,7 @@
     <title>Map of negative factors in Berlin that affect housing comfort</title>
     <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
     <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet'/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <style>
         #map-container {
                 position: absolute;
@@ -23,15 +24,41 @@
     <div id="map"></div>
 </div>
 <script>
+
+    let osm_reason;
+
+    fetch('https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-factors.json.gz')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('no reason details loaded');
+        }
+        return response.arrayBuffer();
+    })
+    .then(data => {
+        osm_reason = JSON.parse(pako.inflate(new Uint8Array(data), { to: 'string' }));
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
     function displayInfo(selectedFeature) {
         if(selectedFeature.properties.fill=='#00ff00') return;
+
+       const h3Index = selectedFeature.properties.h3;
+
+       var issues = '<div style="height: 200px; overflow-y: auto;"><table><thead><tr><th></th></tr></thead><tbody><tr><td>'+
+                        osm_reason[h3Index].map(link => '<a target = "blank" href="https://www.openstreetmap.org/' + link+
+                        '">'+link+'</a>').join('</td></tr><tr><td>')+'</td></tr></tbody></table></div>';
+
         var popup = new maplibregl.Popup()
         .setLngLat(selectedFeature.geometry.coordinates[0][0])
         .setHTML('<h3>count ' + selectedFeature.properties.count +
-                    '<br/>reason '+ selectedFeature.properties.reason+'</h3>')
+                    '<br/>reason '+ selectedFeature.properties.reason +
+                    '<br/>'+issues+
+                  '</h3>')
         .addTo(map);
     }
-    
+
     const style = {
       "version": 8,
         "sources": {
@@ -60,37 +87,48 @@
     });
 
     map.on('load', function () {
-        
-        for (var idx = 0; idx <= 3; idx++) {
 
-            map.addSource('geojson-'+idx, {
+        fetch('https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored.json.gz')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('geojson isn\'t loaded');
+            }
+            return response.arrayBuffer();
+        })
+        .then(data => {
+            const geojson_data = JSON.parse(pako.inflate(new Uint8Array(data), { to: 'string' }));
+
+            map.addSource('geojson', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/igor-suhorukov/igor-suhorukov/main/berlin-h3-10_colored-'+idx+'.json'
+                data: geojson_data
             });
 
             map.addLayer({
-                id: 'geojson-'+idx+'-layer',
+                id: 'geojson-layer',
                 type: 'fill',
-                source: 'geojson-'+idx,
+                source: 'geojson',
                 paint: {
                     'fill-color': ['get', 'fill'],
                     'fill-opacity': 0.5
                 }
             });
 
-            map.on('click', 'geojson-'+idx+'-layer', function (e) {
+            map.on('click', 'geojson-layer', function (e) {
                 var selectedFeature = e.features[0];
                 displayInfo(selectedFeature);
             });
 
-            map.on('mouseenter', 'geojson-'+idx+'-layer', function () {
+            map.on('mouseenter', 'geojson-layer', function () {
                 map.getCanvas().style.cursor = 'pointer';
             });
 
-            map.on('mouseleave', 'geojson-'+idx+'-layer', function () {
+            map.on('mouseleave', 'geojson-layer', function () {
                 map.getCanvas().style.cursor = '';
             });
-        }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     });
 </script>
 </body>
