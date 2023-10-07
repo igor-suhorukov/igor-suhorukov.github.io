@@ -17,9 +17,48 @@
                 width: 100%;
                 height: 100%;
              }
+
+        .overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          justify-content: center;
+          align-items: center;
+        }
+
+        .modal {
+          background-color: white;
+          padding: 20px;
+          border-radius: 5px;
+        }
+        .spinner {
+          border: 16px solid #f3f3f3;
+          border-top: 16px solid #3498db;
+          border-radius: 50%;
+          width: 120px;
+          height: 120px;
+          animation: spin 2s linear infinite; 
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <div class="progress-container">
+            <div class="spinner"></div>
+        </div>
+        <div class="error-message" style="display: none;"></div>
+    </div>
+</div>
 <div id="map-container">
     <div id="map"></div>
 </div>
@@ -88,6 +127,11 @@
 
     map.on('load', function () {
 
+        const overlay = document.getElementById('overlay');
+        const progressBar = document.querySelector('.progress-bar');
+        const errorMessage = document.querySelector('.error-message');
+        overlay.style.display = 'flex';
+        
         fetch('/ny-h3-10_colored.json.gz')
         .then(response => {
             if (!response.ok) {
@@ -125,9 +169,14 @@
             map.on('mouseleave', 'geojson-layer', function () {
                 map.getCanvas().style.cursor = '';
             });
+
+            overlay.style.display = 'none';            
         })
         .catch(error => {
             console.error('Error:', error);
+            overlay.style.display = 'none';
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'Error loading data: ' + error.message;
         });
     });
 </script>
