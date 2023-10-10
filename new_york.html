@@ -170,7 +170,9 @@
                 map.getCanvas().style.cursor = '';
             });
 
-            overlay.style.display = 'none';            
+            map.on('sourcedata', 'geojson-layer', function (e) {
+                overlay.style.display = 'none';
+            });          
         })
         .catch(error => {
             console.error('Error:', error);
