@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>"Глобус" Москвы</title>
+    <meta charset="UTF-8">
+    <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
+    <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet'/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+    <style>
+        #map-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        #map {
+                width: 100%;
+                height: 100%;
+             }
+    </style>
+</head>
+<body>
+<noscript>Карте для работы нужен работающий в браузере JavaScript</noscript>
+<div id="map-container">
+    <div id="map"></div>
+</div>
+
+<script>
+
+    let osm_reason;
+
+    function displayInfo(selectedFeature) {
+        if(selectedFeature.properties.fill=='#00ff00') return;
+
+       const link = selectedFeature.properties.id.replace('w','way/').replace('n','node/').replace('r','relation/');
+
+       var issues = '<a target = "blank" href="https://www.openstreetmap.org/' + link+
+                        '">'+link+'</a>';
+
+        var popup = new maplibregl.Popup()
+        .setLngLat(selectedFeature.geometry.coordinates[0][0])
+        .setHTML('<h3>count ' +issues+
+                  '</h3>')
+        .addTo(map);
+    }
+
+    var map = new maplibregl.Map({
+      container: 'map',
+      //"style": 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      style: {
+        'version': 8,
+        'sources': {
+            'raster-tiles': {
+                'type': 'raster',
+                'tiles': [
+                    // NOTE: Layers from Stadia Maps do not require an API key for localhost development or most production
+                    // web deployments. See https://docs.stadiamaps.com/authentication/ for details.
+                    'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg'
+                ],
+                'tileSize': 256,
+                'attribution':
+                    'Map tiles by <a target="_blank" href="http://stamen.com">Stamen Design</a>; Hosting by <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>. Data &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors'
+            }
+        },
+        'layers': [
+            {
+                'id': 'simple-tiles',
+                'type': 'raster',
+                'source': 'raster-tiles',
+                'minzoom': 0,
+                'maxzoom': 22
+            }
+        ]
+      },
+      center: [37.61815, 55.75211],
+      zoom: 12
+    });
+</script>
+</body>
+</html>
