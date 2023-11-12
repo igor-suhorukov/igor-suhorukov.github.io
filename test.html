@@ -7,7 +7,14 @@
     <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
     <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet'/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var images = document.getElementsByTagName('img');
+      for (var i = 0; i < images.length; i++) {
+        images[i].crossOrigin = 'Anonymous';
+      }
+    });
+  </script>
     <style>
         #map-container {
                 position: absolute;
