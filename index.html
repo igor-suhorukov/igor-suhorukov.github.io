@@ -1,135 +1,120 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
-<head>
-    <title>Map of negative factors in Berlin that affect housing comfort</title>
+<html lang="en">
+  <head>
+    <title>Москва, где мне комфортно</title>
+    <meta charset="UTF-8">
     <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
     <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet'/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <style>
-        #map-container {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-        #map {
-                width: 100%;
-                height: 100%;
-             }
-    </style>
-</head>
-<body>
-<div id="map-container">
-    <div id="map"></div>
-</div>
-<script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script type="module" crossorigin src="/assets/index-b735bf14.js"></script>
+    <link rel="stylesheet" href="/assets/index-04431092.css">
+  </head>
+  <body>
+    <noscript>Карте для работы нужен работающий в браузере JavaScript</noscript>
+    <div id="map-container">
+      <div id="map"></div>
+    </div>
+    <div id="floating-window" class="minimized">
+      <div id="window-header">
+        <span id="resize-icon" class="fas fa-expand-arrows-alt"></span>Фильтры
+      </div>
+      <div id="window-content">
+        <p>Близость жилья к фактору влияющему на:</p>
+          <div class="range-wrap" style="width: 75%;">
+            <label for="_air_quality">Загрязнение воздуха</label>
+            <input id="_air_quality" type="range" class="range" min="-1" max="500" step="1" value="-1">
+            <output class="bubble"></output>
+          </div>
+          <div class="range-wrap" style="width: 75%;">
+            <label for="_noisy_place">Уровень шума</label>
+            <input id="_noisy_place" type="range" class="range" min="-1" max="500" step="1" value="-1">
+            <output class="bubble"></output>
+          </div>
+          <div class="range-wrap" style="width: 75%;">
+            <label for="_industrial">Индустриальность окрестностей</label>
+            <input id="_industrial" type="range" class="range" min="-1" max="500" step="1" value="-1">
+            <output class="bubble"></output>
+          </div>
+          <div class="range-wrap" style="width: 75%;">
+            <label for="_mosquitoes">Большую вероятность встречи с комарами</label>
+            <input id="_mosquitoes" type="range" class="range" min="-1" max="500" step="1" value="-1">
+            <output class="bubble"></output>
+          </div>
+          <div class="range-wrap" style="width: 75%;">
+            <label for="_sad_place">Созерцание скорби</label>
+            <input id="_sad_place" type="range" class="range" min="-1" max="500" step="1" value="-1">
+            <output class="bubble"></output>
+          </div>
+          <div class="range-wrap" style="width: 75%;">
+            <label for="_dangerous">Опасность</label>
+            <input id="_dangerous" type="range" class="range" min="-1" max="500" step="1" value="-1">
+            <output class="bubble"></output>
+          </div>
+        <div>
+          <button id="refresh">Обновить карту</button>
+        </div>
 
-    let osm_reason;
+        <div style="margin-top:20pt;"><label for="cust_filter">Что ищем:</label>
+          <input id="cust_filter" type="text">
+          <select id="cust_color">
+            <option value="green">зеленый</option>
+            <option value="yellow">желтый</option>
+            <option value="blue">синий</option>
+            <option value="purple">фиолетовый</option>
+            <option value="orange">оранжевый</option>
+          </select>
+          <button id="button_filter">Найти</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const allRanges = document.querySelectorAll(".range-wrap");
+      allRanges.forEach(wrap => {
+        const range = wrap.querySelector(".range");
+        range.value = -1;
+        const bubble = wrap.querySelector(".bubble");
 
-    fetch('/berlin-factors.json.gz')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('no reason details loaded');
-        }
-        return response.arrayBuffer();
-    })
-    .then(data => {
-        osm_reason = JSON.parse(pako.inflate(new Uint8Array(data), { to: 'string' }));
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-
-    function displayInfo(selectedFeature) {
-        if(selectedFeature.properties.fill=='#00ff00') return;
-
-       const h3Index = selectedFeature.properties.h3;
-
-       var issues = '<div style="height: 200px; overflow-y: auto;"><table><thead><tr><th></th></tr></thead><tbody><tr><td>'+
-                        osm_reason[h3Index].map(link => '<a target = "blank" href="https://www.openstreetmap.org/' + link+
-                        '">'+link+'</a>').join('</td></tr><tr><td>')+'</td></tr></tbody></table></div>';
-
-        var popup = new maplibregl.Popup()
-        .setLngLat(selectedFeature.geometry.coordinates[0][0])
-        .setHTML('<h3>count ' + selectedFeature.properties.count +
-                    '<br/>reason '+ selectedFeature.properties.reason +
-                    '<br/>'+issues+
-                  '</h3>')
-        .addTo(map);
-    }
-
-    const style = {
-      "version": 8,
-        "sources": {
-        "osm": {
-                "type": "raster",
-                "tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
-                "tileSize": 256,
-          "attribution": "&copy; OpenStreetMap Contributors",
-          "maxzoom": 19
-        }
-      },
-      "layers": [
-        {
-          "id": "osm",
-          "type": "raster",
-          "source": "osm"
-        }
-      ]
-    };
-
-    var map = new maplibregl.Map({
-      container: 'map',
-      style: style,
-      center: [13.4092, 52.5151],
-      zoom: 12
-    });
-
-    map.on('load', function () {
-
-        fetch('/berlin-h3-10_colored.json.gz')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('geojson isn\'t loaded');
-            }
-            return response.arrayBuffer();
-        })
-        .then(data => {
-            const geojson_data = JSON.parse(pako.inflate(new Uint8Array(data), { to: 'string' }));
-
-            map.addSource('geojson', {
-                type: 'geojson',
-                data: geojson_data
-            });
-
-            map.addLayer({
-                id: 'geojson-layer',
-                type: 'fill',
-                source: 'geojson',
-                paint: {
-                    'fill-color': ['get', 'fill'],
-                    'fill-opacity': 0.5
-                }
-            });
-
-            map.on('click', 'geojson-layer', function (e) {
-                var selectedFeature = e.features[0];
-                displayInfo(selectedFeature);
-            });
-
-            map.on('mouseenter', 'geojson-layer', function () {
-                map.getCanvas().style.cursor = 'pointer';
-            });
-
-            map.on('mouseleave', 'geojson-layer', function () {
-                map.getCanvas().style.cursor = '';
-            });
-        })
-        .catch(error => {
-            console.error('Error:', error);
+        range.addEventListener("input", () => {
+          setBubble(range, bubble);
         });
-    });
-</script>
-</body>
+        setBubble(range, bubble);
+      });
+
+      function setBubble(range, bubble) {
+        const val = range.value;
+        const min = range.min ? range.min : 0;
+        const max = range.max ? range.max : 100;
+        const newVal = Number(((val - min) * 100) / (max - min));
+        if(val==-1){
+          bubble.innerHTML = "Выкл.";
+        } else{
+          bubble.color="green";
+          bubble.innerHTML = val;
+        }
+        bubble.style.left = `calc(${newVal}% + (${8 - newVal * 0.15}px))`;
+      }
+
+      var floatingWindow = document.getElementById('floating-window');
+
+      document.getElementById('window-header').addEventListener('click', function () {
+        if (floatingWindow.classList.contains('minimized')) {
+          floatingWindow.classList.remove('minimized');
+        } else {
+          floatingWindow.classList.add('minimized');
+        }
+      });
+
+      document.getElementById('resize-icon').addEventListener('click', function (event) {
+        event.stopPropagation();
+        if (floatingWindow.classList.contains('minimized')) {
+          floatingWindow.classList.remove('minimized');
+        } else {
+          floatingWindow.classList.add('minimized');
+        }
+      });
+    </script>
+    
+  </body>
 </html>
